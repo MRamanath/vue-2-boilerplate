@@ -1,4 +1,3 @@
 To serve the application >> install node -g serve
 then use it like >> serve -s dist
-
 It is must do
