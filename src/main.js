@@ -3,8 +3,6 @@ import store from '~/store'
 import router from '~/router'
 import App from '~/components/App'
 
-import '~/assets/styles/app.scss'
-
 import '~/plugins'
 import '~/components'
 

@@ -16,7 +16,12 @@ const compressionConfig = new CompressionWebpackPlugin({
 module.exports = {
 	css: {
 		requireModuleExtension: true,
-		sourceMap: false
+		sourceMap: false,
+		loaderOptions: {
+			scss: {
+				prependData: `@import "~/assets/styles/app.scss";`
+			}
+		}
 	},
 	configureWebpack: {
 		resolve: {
