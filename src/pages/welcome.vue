@@ -13,6 +13,9 @@
 		<div class="text-center">
 			<div class="title mb-4">
 				{{ title }}
+				<div>
+					<img v-lazy="'https://via.placeholder.com/250'" />
+				</div>
 			</div>
 
 			<div class="links">
@@ -38,9 +41,14 @@ export default {
 		title: process.env.VUE_APP_NAME
 	}),
 
-	computed: mapGetters({
-		authenticated: 'auth/check'
-	})
+	computed: {
+		imgUrl() {
+			return require('~/assets/images/test.jpg')
+		},
+		...mapGetters({
+			authenticated: 'auth/check'
+		})
+	}
 }
 </script>
 
