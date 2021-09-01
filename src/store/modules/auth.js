@@ -50,7 +50,7 @@ export const actions = {
 
 	async fetchUser({ commit }) {
 		try {
-			const { data } = await this.$http.get('/api/user')
+			const { data } = await this.$http.get('users/self')
 
 			commit(types.FETCH_USER_SUCCESS, { user: data })
 		} catch (e) {
@@ -64,7 +64,7 @@ export const actions = {
 
 	async logout({ commit }) {
 		try {
-			await this.$http.post('/api/logout')
+			await this.$http.post('users/logout')
 		} catch (e) {
 			//
 		}

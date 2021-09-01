@@ -5,7 +5,7 @@ import store from '~/store'
 import router from '~/router'
 
 // Axios API URL setup
-axios.defaults.baseURL = process.env.VUE_API_URL || ''
+axios.defaults.baseURL = process.env.VUE_APP_URL || ''
 
 // Globally registering axios // can be called like this way now - this.$http.get()
 Vue.prototype.$http = axios
