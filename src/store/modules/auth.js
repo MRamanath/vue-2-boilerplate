@@ -1,3 +1,4 @@
+import axios from 'axios'
 import Cookies from 'js-cookie'
 import * as types from '../mutation-types'
 
@@ -50,9 +51,9 @@ export const actions = {
 
 	async fetchUser({ commit }) {
 		try {
-			const { data } = await this.$http.get('users/self')
+			const { data } = await axios({ url: 'users/self', method: 'GET' })
 
-			commit(types.FETCH_USER_SUCCESS, { user: data })
+			commit(types.FETCH_USER_SUCCESS, { user: data.data })
 		} catch (e) {
 			commit(types.FETCH_USER_FAILURE)
 		}
@@ -64,7 +65,7 @@ export const actions = {
 
 	async logout({ commit }) {
 		try {
-			await this.$http.post('users/logout')
+			await axios.post('users/logout')
 		} catch (e) {
 			//
 		}
@@ -73,7 +74,7 @@ export const actions = {
 	},
 
 	async fetchOauthUrl(ctx, { provider }) {
-		const { data } = await this.$http.post(`/api/oauth/${provider}`)
+		const { data } = await axios.post(`/api/oauth/${provider}`)
 
 		return data.url
 	}

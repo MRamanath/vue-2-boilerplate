@@ -19,7 +19,7 @@
 					<!-- Submit Button -->
 					<div class="mb-3 row">
 						<div class="col-md-9 ms-md-auto">
-							<v-button :loading="form.busy">send_password_reset_link</v-button>
+							<v-button :loading="busy">send_password_reset_link</v-button>
 						</div>
 					</div>
 				</form>
@@ -37,20 +37,29 @@ export default {
 	},
 
 	data: () => ({
-		status: '',
 		form: {
-			email: '',
-			busy: false
-		}
+			email: ''
+		},
+		busy: false,
+		errorAlert: ''
 	}),
 
 	methods: {
 		async send() {
-			const { data } = await this.$http.post('/api/password/email')
+			this.busy = true
+			try {
+				await this.$http({
+					url: '/users/password/forgot',
+					method: 'POST',
+					data: this.form
+				})
 
-			this.status = data.status
-
-			// this.form.reset()
+				// this.form.reset()
+				this.busy = false
+			} catch (e) {
+				this.errorAlert = e.response.data.message
+				this.busy = false
+			}
 		}
 	}
 }

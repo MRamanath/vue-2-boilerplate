@@ -49,7 +49,7 @@
 					<div class="mb-3 row">
 						<div class="col-md-7 offset-md-3 d-flex">
 							<!-- Submit Button -->
-							<v-button :loading="form.busy"> login </v-button>
+							<v-button :loading="busy"> login </v-button>
 						</div>
 					</div>
 				</form>
@@ -71,28 +71,39 @@ export default {
 	data: () => ({
 		form: {
 			email: '',
-			password: '',
-			busy: false
+			password: ''
 		},
-		remember: false
+		busy: false,
+		remember: false,
+		errorAlert: ''
 	}),
 
 	methods: {
 		async login() {
-			// Submit the form.
-			const { data } = await this.$http.post('users/login')
+			this.busy = true
+			try {
+				// Submit the form.
+				const { data } = await this.$http({
+					url: 'users/login',
+					method: 'POST',
+					data: this.form
+				})
 
-			// Save the token.
-			this.$store.dispatch('auth/saveToken', {
-				token: data.token,
-				remember: this.remember
-			})
+				// Save the token.
+				this.$store.dispatch('auth/saveToken', {
+					token: data.token,
+					remember: this.remember
+				})
 
-			// Fetch the user.
-			await this.$store.dispatch('auth/fetchUser')
+				// Save the user.
+				await this.$store.dispatch('auth/updateUser', { user: data.data.user })
 
-			// Redirect home.
-			this.redirect()
+				// Redirect home.
+				this.redirect()
+			} catch (e) {
+				this.errorAlert = e.response.data.message
+				this.busy = false
+			}
 		},
 
 		redirect() {

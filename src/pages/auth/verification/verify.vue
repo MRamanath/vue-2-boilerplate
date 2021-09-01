@@ -6,10 +6,6 @@
 					<div class="alert alert-success" role="alert">
 						{{ success }}
 					</div>
-
-					<router-link :to="{ name: 'login' }" class="btn btn-primary">
-						login
-					</router-link>
 				</template>
 				<template v-else>
 					<div class="alert alert-danger" role="alert">
@@ -29,20 +25,18 @@
 </template>
 
 <script>
-const qs = (params) =>
-	Object.keys(params)
-		.map((key) => `${key}=${params[key]}`)
-		.join('&')
-
+import axios from 'axios'
 export default {
 	async beforeRouteEnter(to, from, next) {
 		try {
-			const { data } = await this.$http.post(
-				`/api/email/verify/${to.params.id}?${qs(to.query)}`
-			)
+			const { data } = await axios({
+				url: `users/email/verify/${to.params.token}`,
+				method: 'PATCH'
+			})
 
-			next((vm) => {
+			next(async (vm) => {
 				vm.success = data.status
+				await vm.login(data)
 			})
 		} catch (e) {
 			next((vm) => {
@@ -60,6 +54,19 @@ export default {
 	data: () => ({
 		error: '',
 		success: ''
-	})
+	}),
+
+	methods: {
+		async login(data) {
+			// Save the token.
+			this.$store.dispatch('auth/saveToken', { token: data.token })
+
+			// Log in the user.
+			await this.$store.dispatch('auth/updateUser', { user: data.data.user })
+
+			// Redirect home.
+			this.$router.push({ name: 'home' })
+		}
+	}
 }
 </script>

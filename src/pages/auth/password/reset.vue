@@ -41,10 +41,10 @@
 						}}</label>
 						<div class="col-md-7">
 							<input
-								v-model="form.password_confirmation"
+								v-model="form.passwordConfirm"
 								class="form-control"
 								type="password"
-								name="password_confirmation"
+								name="passwordConfirm"
 							/>
 						</div>
 					</div>
@@ -52,7 +52,7 @@
 					<!-- Submit Button -->
 					<div class="mb-3 row">
 						<div class="col-md-9 ms-md-auto">
-							<v-button :loading="form.busy">
+							<v-button :loading="busy">
 								{{ $t('reset_password') }}
 							</v-button>
 						</div>
@@ -74,26 +74,35 @@ export default {
 	data: () => ({
 		status: '',
 		form: {
-			token: '',
-			email: '',
 			password: '',
-			password_confirmation: '',
-			busy: false
-		}
+			passwordConfirm: ''
+		},
+		busy: false,
+		errorAlert: ''
 	}),
-
-	created() {
-		this.form.email = this.$route.query.email
-		this.form.token = this.$route.params.token
-	},
 
 	methods: {
 		async reset() {
-			const { data } = await this.$http.post('/api/password/reset')
+			this.busy = true
+			try {
+				const { data } = await this.$http({
+					url: `/users/password/reset/${this.$route.params.token}`,
+					method: 'PATCH',
+					data: this.form
+				})
 
-			this.status = data.status
+				// Save the token.
+				this.$store.dispatch('auth/saveToken', { token: data.token })
 
-			// this.form.reset()
+				// Log in the user.
+				await this.$store.dispatch('auth/updateUser', { user: data.data.user })
+
+				// Redirect home.
+				this.$router.push({ name: 'home' })
+			} catch (e) {
+				this.errorAlert = e.response.data.message
+				this.busy = false
+			}
 		}
 	}
 }

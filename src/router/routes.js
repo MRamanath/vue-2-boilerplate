@@ -21,7 +21,7 @@ export default [
 		component: page('auth/password/reset.vue')
 	},
 	{
-		path: '/email/verify/:id',
+		path: '/email/verify/:token',
 		name: 'verification.verify',
 		component: page('auth/verification/verify.vue')
 	},
