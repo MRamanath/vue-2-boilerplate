@@ -1,69 +1,86 @@
 <template>
 	<div class="row">
-		<div v-if="isVerificationPending">
+		<div class="col-md-8 mx-auto" v-if="isVerificationPending">
+			Please verify your email -
 			<router-link
 				:to="{
 					name: 'verification.resend',
 					query: { email: form.email }
 				}"
-				class="small float-end"
 			>
-				resend_verification_link
+				Resend Verification Link
 			</router-link>
 		</div>
-		<div class="col-lg-7 m-auto">
-			<card :title="'login'">
-				<form @submit.prevent="login">
-					<!-- Email -->
-					<div class="mb-3 row">
-						<label class="col-md-3 col-form-label text-md-end">email</label>
-						<div class="col-md-7">
+		<div class="col-md-6 mx-auto">
+			<card :title="'Login'">
+				<ValidationObserver
+					ref="form"
+					v-slot="{ handleSubmit, invalid }"
+					tag="div"
+					class="form-group"
+				>
+					<form @submit.prevent="handleSubmit(login)">
+						<ValidationProvider
+							vid="email"
+							name="E-mail"
+							rules="required|email"
+							v-slot="{ errors, valid, dirty }"
+							tag="div"
+							class="col-md-12"
+						>
+							<label for="email">Email</label>
 							<input
+								id="email"
 								v-model="form.email"
-								class="form-control"
 								type="email"
-								name="email"
-							/>
-						</div>
-					</div>
-
-					<!-- Password -->
-					<div class="mb-3 row">
-						<label class="col-md-3 col-form-label text-md-end">password</label>
-						<div class="col-md-7">
-							<input
-								v-model="form.password"
 								class="form-control"
-								type="password"
-								name="password"
+								:class="!valid && dirty ? 'is-invalid' : ''"
 							/>
-						</div>
-					</div>
+							<div v-if="dirty" :class="!valid ? 'invalid-feedback' : ''">
+								{{ errors[0] }}
+							</div>
+						</ValidationProvider>
 
-					<!-- Remember Me -->
-					<div class="mb-3 row">
-						<div class="col-md-3" />
-						<div class="col-md-7 d-flex">
-							<checkbox v-model="remember" name="remember">
-								remember_me
+						<ValidationProvider
+							vid="password"
+							name="Password"
+							rules="required|min:8"
+							v-slot="{ errors, valid, dirty }"
+							tag="div"
+							class="col-md-12 pt-2"
+						>
+							<label for="password">Password</label>
+							<input
+								id="password"
+								v-model="form.password"
+								type="password"
+								class="form-control"
+								autocomplete="on"
+								:class="!valid && dirty ? 'is-invalid' : ''"
+							/>
+							<div v-if="dirty" :class="!valid ? 'invalid-feedback' : ''">
+								{{ errors[0] }}
+							</div>
+						</ValidationProvider>
+
+						<div class="col-md-12 pt-2 pb-2 d-flex justify-content-between">
+							<checkbox v-model="remember" name="remember" class="pr-2">
+								remember me
 							</checkbox>
 
 							<router-link
 								:to="{ name: 'password.request' }"
 								class="small ms-auto my-auto"
 							>
-								forgot_password
+								forgot password?
 							</router-link>
 						</div>
-					</div>
 
-					<div class="mb-3 row">
-						<div class="col-md-7 offset-md-3 d-flex">
-							<!-- Submit Button -->
-							<v-button :loading="busy"> login </v-button>
+						<div class="d-flex justify-content-center">
+							<v-button :loading="busy" :disabled="invalid"> Login </v-button>
 						</div>
-					</div>
-				</form>
+					</form>
+				</ValidationObserver>
 			</card>
 		</div>
 	</div>
@@ -71,12 +88,17 @@
 
 <script>
 import Cookies from 'js-cookie'
-
+import { ValidationObserver, ValidationProvider } from '~/plugins/vee-validate'
 export default {
 	middleware: 'guest',
 
 	metaInfo() {
 		return { title: 'login' }
+	},
+
+	components: {
+		ValidationProvider,
+		ValidationObserver
 	},
 
 	data: () => ({
@@ -118,6 +140,10 @@ export default {
 				// Redirect home.
 				this.redirect()
 			} catch (e) {
+				// should receive error format following way
+				// this.$refs.form.setErrors({
+				// 	email: ['email is required']
+				// })
 				this.errorAlert = e.response.data.message
 				this.busy = false
 			}
