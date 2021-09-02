@@ -19,7 +19,7 @@
 					<!-- Submit Button -->
 					<div class="mb-3 row">
 						<div class="col-md-9 ms-md-auto">
-							<v-button :loading="form.busy"> send_verification_link </v-button>
+							<v-button :loading="busy"> send_verification_link </v-button>
 						</div>
 					</div>
 				</form>
@@ -37,11 +37,11 @@ export default {
 	},
 
 	data: () => ({
-		status: '',
 		form: {
-			email: '',
-			busy: false
-		}
+			email: ''
+		},
+		busy: false,
+		errorAlert: ''
 	}),
 
 	created() {
@@ -52,11 +52,20 @@ export default {
 
 	methods: {
 		async send() {
-			const { data } = await this.$http.post('/api/email/resend')
-
-			this.status = data.status
-
-			this.form.reset()
+			this.busy = true
+			try {
+				const { data } = await this.$http({
+					url: '/users/email/resend',
+					method: 'PATCH',
+					data: this.form.email
+				})
+				console.log(data)
+				this.busy = false
+				// this.form.reset()
+			} catch (error) {
+				this.errorAlert = error.response.data.message
+				this.busy = false
+			}
 		}
 	}
 }

@@ -13,7 +13,10 @@
 					</div>
 
 					<router-link
-						:to="{ name: 'verification.resend' }"
+						:to="{
+							name: 'verification.resend',
+							query: { email: $route.query.email }
+						}"
 						class="small float-end"
 					>
 						resend_verification_link

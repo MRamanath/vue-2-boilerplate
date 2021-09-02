@@ -1,5 +1,16 @@
 <template>
 	<div class="row">
+		<div v-if="isVerificationPending">
+			<router-link
+				:to="{
+					name: 'verification.resend',
+					query: { email: form.email }
+				}"
+				class="small float-end"
+			>
+				resend_verification_link
+			</router-link>
+		</div>
 		<div class="col-lg-7 m-auto">
 			<card :title="'login'">
 				<form @submit.prevent="login">
@@ -75,7 +86,8 @@ export default {
 		},
 		busy: false,
 		remember: false,
-		errorAlert: ''
+		errorAlert: '',
+		isVerificationPending: false
 	}),
 
 	methods: {
@@ -88,6 +100,11 @@ export default {
 					method: 'POST',
 					data: this.form
 				})
+
+				if (data.action && data.action === 'verificationPending') {
+					this.isVerificationPending = true
+					return
+				}
 
 				// Save the token.
 				this.$store.dispatch('auth/saveToken', {

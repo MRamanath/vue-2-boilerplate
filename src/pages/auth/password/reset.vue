@@ -1,29 +1,13 @@
 <template>
 	<div class="row">
 		<div class="col-lg-7 m-auto">
-			<card :title="$t('reset_password')">
+			<card :title="'reset_password'">
 				<form @submit.prevent="reset">
-					<!-- Email -->
-					<div class="mb-3 row">
-						<label class="col-md-3 col-form-label text-md-end">{{
-							$t('email')
-						}}</label>
-						<div class="col-md-7">
-							<input
-								v-model="form.email"
-								class="form-control"
-								type="email"
-								name="email"
-								readonly
-							/>
-						</div>
-					</div>
-
 					<!-- Password -->
 					<div class="mb-3 row">
-						<label class="col-md-3 col-form-label text-md-end">{{
-							$t('password')
-						}}</label>
+						<label class="col-md-3 col-form-label text-md-end">
+							Password
+						</label>
 						<div class="col-md-7">
 							<input
 								v-model="form.password"
@@ -36,9 +20,9 @@
 
 					<!-- Password Confirmation -->
 					<div class="mb-3 row">
-						<label class="col-md-3 col-form-label text-md-end">{{
-							$t('confirm_password')
-						}}</label>
+						<label class="col-md-3 col-form-label text-md-end"
+							>Confirm Password</label
+						>
 						<div class="col-md-7">
 							<input
 								v-model="form.passwordConfirm"
@@ -52,9 +36,7 @@
 					<!-- Submit Button -->
 					<div class="mb-3 row">
 						<div class="col-md-9 ms-md-auto">
-							<v-button :loading="busy">
-								{{ $t('reset_password') }}
-							</v-button>
+							<v-button :loading="busy"> Reset Password </v-button>
 						</div>
 					</div>
 				</form>
