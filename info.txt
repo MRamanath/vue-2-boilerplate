@@ -5,3 +5,7 @@ It is must do
 __________________________
 
 use npm ci to install the dependencies
+
+form-dirty check
+___________________________________
+https://vee-validate.logaretm.com/v2/guide/flags.html#introduction
