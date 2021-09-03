@@ -2,11 +2,11 @@
 	<div>
 		<div class="top-right links">
 			<template v-if="authenticated">
-				<router-link :to="{ name: 'home' }"> home </router-link>
+				<router-link :to="{ name: 'home' }"> Home </router-link>
 			</template>
 			<template v-else>
-				<router-link :to="{ name: 'login' }"> login </router-link>
-				<router-link :to="{ name: 'register' }"> register </router-link>
+				<router-link :to="{ name: 'login' }"> Login </router-link>
+				<router-link :to="{ name: 'register' }"> Register </router-link>
 			</template>
 		</div>
 
@@ -16,12 +16,6 @@
 				<div>
 					<img v-lazy="'https://via.placeholder.com/250'" />
 				</div>
-			</div>
-
-			<div class="links">
-				<a href="https://github.com/cretueusebiu/laravel-vue-spa"
-					>github.com/cretueusebiu/laravel-vue-spa</a
-				>
 			</div>
 		</div>
 	</div>

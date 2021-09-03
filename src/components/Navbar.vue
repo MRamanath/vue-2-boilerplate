@@ -1,62 +1,68 @@
 <template>
-	<nav class="navbar navbar-expand-lg navbar-light bg-white">
+	<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
 		<div class="container">
+			<button
+				class="navbar-toggler"
+				type="button"
+				data-toggle="collapse"
+				data-target="#navBarToggler"
+				aria-controls="navBarToggler"
+				aria-expanded="false"
+				aria-label="Toggle navigation"
+			>
+				<span class="navbar-toggler-icon"></span>
+			</button>
 			<router-link
-				:to="{ name: user ? 'home' : 'welcome' }"
-				class="navbar-brand"
+				:to="{ name: 'welcome' }"
+				class="navbar-brand text-uppercase"
+				style="letter-spacing: 3px"
 			>
 				{{ appName }}
 			</router-link>
 
-			<button
-				class="navbar-toggler"
-				type="button"
-				data-bs-toggle="collapse"
-				data-bs-target="#navbar"
+			<div
+				class="collapse navbar-collapse d-flex justify-content-end"
+				id="navBarToggler"
 			>
-				<span class="navbar-toggler-icon" />
-			</button>
-
-			<div id="navbar" class="collapse navbar-collapse">
-				<ul class="navbar-nav">
-					<!-- <li class="nav-item">
-            <a class="nav-link" href="#">Link</a>
-          </li> -->
-				</ul>
-
-				<ul class="navbar-nav ms-auto">
+				<ul class="navbar-nav mt-2 mt-lg-0">
 					<!-- Authenticated -->
-					<li v-if="user" class="nav-item dropdown">
-						<a
-							class="nav-link dropdown-toggle text-dark"
-							href="#"
-							role="button"
-							data-bs-toggle="dropdown"
-							aria-haspopup="true"
-							aria-expanded="false"
-						>
-							<img
-								:src="user.photo_url"
-								class="rounded-circle profile-photo me-1"
-							/>
-							{{ user.name }}
-						</a>
-						<div class="dropdown-menu">
-							<router-link
-								:to="{ name: 'settings.profile' }"
-								class="dropdown-item ps-3"
+					<template v-if="user">
+						<li class="nav-item dropdown">
+							<a
+								class="nav-link dropdown-toggle"
+								href="#"
+								id="navbarDropdownMenuLink"
+								role="button"
+								data-toggle="dropdown"
+								aria-haspopup="true"
+								aria-expanded="false"
 							>
-								<fa icon="cog" fixed-width />
-								settings
-							</router-link>
-
-							<div class="dropdown-divider" />
-							<a href="#" class="dropdown-item ps-3" @click.prevent="logout">
-								<fa icon="sign-out-alt" fixed-width />
-								logout
+								<img
+									:src="user.photo"
+									class="rounded-circle profile-photo me-1"
+									alt="photo"
+								/>
+								{{ user.name }}
 							</a>
-						</div>
-					</li>
+							<div
+								class="dropdown-menu"
+								aria-labelledby="navbarDropdownMenuLink"
+							>
+								<router-link
+									:to="{ name: 'settings.profile' }"
+									class="dropdown-item ps-3"
+								>
+									<fa icon="cog" fixed-width />
+									Settings
+								</router-link>
+								<div class="dropdown-divider" />
+								<a href="#" class="dropdown-item ps-3" @click.prevent="logout">
+									<fa icon="sign-out-alt" fixed-width />
+									Logout
+								</a>
+							</div>
+						</li>
+					</template>
 					<!-- Guest -->
 					<template v-else>
 						<li class="nav-item">
@@ -65,7 +71,7 @@
 								class="nav-link"
 								active-class="active"
 							>
-								login
+								Sign In
 							</router-link>
 						</li>
 						<li class="nav-item">
@@ -74,7 +80,7 @@
 								class="nav-link"
 								active-class="active"
 							>
-								register
+								Sign Up
 							</router-link>
 						</li>
 					</template>
@@ -102,7 +108,7 @@ export default {
 			await this.$store.dispatch('auth/logout')
 
 			// Redirect to login.
-			this.$router.push({ name: 'login' })
+			this.$router.push({ name: 'welcome' })
 		}
 	}
 }

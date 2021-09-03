@@ -48,7 +48,7 @@
 						<ValidationProvider
 							vid="password"
 							name="Password"
-							rules="required|min:8"
+							rules="required"
 							v-slot="{ errors, valid, dirty }"
 							tag="div"
 							class="col-md-12 pt-2"

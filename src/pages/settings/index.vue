@@ -1,7 +1,7 @@
 <template>
 	<div class="row justify-content-center">
 		<div class="col-md-3 mb-3">
-			<card :title="$t('settings')" class="settings-card">
+			<card title="Settings" class="settings-card">
 				<ul class="nav flex-column nav-pills">
 					<li v-for="tab in tabs" :key="tab.route" class="nav-item">
 						<router-link
@@ -34,12 +34,12 @@ export default {
 			return [
 				{
 					icon: 'user',
-					name: 'profile',
+					name: 'Profile',
 					route: 'settings.profile'
 				},
 				{
 					icon: 'lock',
-					name: 'password',
+					name: 'Password',
 					route: 'settings.password'
 				}
 			]

@@ -53,7 +53,7 @@ export const actions = {
 		try {
 			const { data } = await axios({ url: 'users/self', method: 'GET' })
 
-			commit(types.FETCH_USER_SUCCESS, { user: data.data })
+			commit(types.FETCH_USER_SUCCESS, { user: data.data.data })
 		} catch (e) {
 			commit(types.FETCH_USER_FAILURE)
 		}

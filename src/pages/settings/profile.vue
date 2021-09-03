@@ -1,58 +1,83 @@
 <template>
-	<card :title="$t('your_info')">
-		<form @submit.prevent="update">
-			<!-- Name -->
-			<div class="mb-3 row">
-				<label class="col-md-3 col-form-label text-md-end">name</label>
-				<div class="col-md-7">
+	<card title="Your Info">
+		<ValidationObserver
+			ref="form"
+			v-slot="{ handleSubmit, invalid }"
+			tag="div"
+			class="form-group"
+		>
+			<form @submit.prevent="handleSubmit(update)">
+				<ValidationProvider
+					vid="name"
+					name="Name"
+					rules="required|alpha_spaces|max:25"
+					v-slot="{ errors, valid, dirty }"
+					tag="div"
+					class="col-md-12"
+				>
+					<label for="name">Name</label>
 					<input
+						id="name"
 						v-model="form.name"
-						class="form-control"
 						type="text"
-						name="name"
-					/>
-				</div>
-			</div>
-
-			<!-- Email -->
-			<div class="mb-3 row">
-				<label class="col-md-3 col-form-label text-md-end">email</label>
-				<div class="col-md-7">
-					<input
-						v-model="form.email"
 						class="form-control"
-						type="email"
-						name="email"
+						:class="!valid && dirty ? 'is-invalid' : ''"
 					/>
-				</div>
-			</div>
+					<div v-if="dirty" :class="!valid ? 'invalid-feedback' : ''">
+						{{ errors[0] }}
+					</div>
+				</ValidationProvider>
+				<ValidationProvider
+					vid="email"
+					name="E-mail"
+					rules="required|email"
+					v-slot="{ errors, valid, dirty }"
+					tag="div"
+					class="col-md-12 pt-2"
+				>
+					<label for="email">Email</label>
+					<input
+						id="email"
+						v-model="form.email"
+						type="email"
+						class="form-control"
+						:class="!valid && dirty ? 'is-invalid' : ''"
+						disabled
+					/>
+					<div v-if="dirty" :class="!valid ? 'invalid-feedback' : ''">
+						{{ errors[0] }}
+					</div>
+				</ValidationProvider>
 
-			<!-- Submit Button -->
-			<div class="mb-3 row">
-				<div class="col-md-9 ms-md-auto">
-					<v-button :loading="form.busy" type="success"> update </v-button>
+				<div class="col-md-12 pt-3 pb-3 d-flex justify-content-start">
+					<v-button :loading="busy" :disabled="invalid"> Update </v-button>
 				</div>
-			</div>
-		</form>
+			</form>
+		</ValidationObserver>
 	</card>
 </template>
 
 <script>
 import { mapGetters } from 'vuex'
-
+import { ValidationObserver, ValidationProvider } from '~/plugins/vee-validate'
 export default {
 	scrollToTop: false,
 
 	metaInfo() {
-		return { title: 'settings' }
+		return { title: 'Settings - Your Info' }
+	},
+
+	components: {
+		ValidationProvider,
+		ValidationObserver
 	},
 
 	data: () => ({
 		form: {
 			name: '',
-			email: '',
-			busy: false
-		}
+			email: ''
+		},
+		busy: false
 	}),
 
 	computed: mapGetters({
@@ -61,16 +86,29 @@ export default {
 
 	created() {
 		// Fill the form with user data.
-		// this.form.keys().forEach((key) => {
-		// 	this.form[key] = this.user[key]
-		// })
+		Object.keys(this.form).forEach((key) => (this.form[key] = this.user[key]))
 	},
 
 	methods: {
 		async update() {
-			const { data } = await this.$http.patch('/api/settings/profile')
+			this.busy = true
+			try {
+				const { data } = await this.$http({
+					url: '/users/update/self',
+					method: 'PATCH',
+					data: this.form
+				})
 
-			this.$store.dispatch('auth/updateUser', { user: data })
+				this.$store.dispatch('auth/updateUser', { user: data.data.user })
+				this.busy = false
+			} catch (error) {
+				// should receive error format following way
+				// this.$refs.form.setErrors({
+				// 	email: ['email is required']
+				// })
+				this.errorAlert = error.response.data.message
+				this.busy = false
+			}
 		}
 	}
 }
