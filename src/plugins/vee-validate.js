@@ -1,7 +1,14 @@
 // https://vee-validate.logaretm.com/v3/guide/rules.html#importing-the-rules
 
 import { ValidationObserver, ValidationProvider, extend } from 'vee-validate'
-import { required, email, min } from 'vee-validate/dist/rules'
+import {
+	required,
+	email,
+	min,
+	confirmed,
+	alpha_spaces,
+	max
+} from 'vee-validate/dist/rules'
 
 const messages = {
 	alpha: 'The {_field_} field may only contain alphabetic characters',
@@ -35,19 +42,20 @@ const messages = {
 	double: 'The {_field_} field must be a valid decimal'
 }
 
-extend('min', {
-	...min,
-	message: messages['min']
-})
+const rules = {
+	min: min,
+	max: max,
+	alpha_spaces: alpha_spaces,
+	confirmed: confirmed,
+	email: email,
+	required: required
+}
 
-extend('email', {
-	...email,
-	message: messages['email']
-})
-
-extend('required', {
-	...required,
-	message: messages['required']
+Object.keys(rules).forEach((rule) => {
+	extend(rule, {
+		...rules[rule], // copies rule configuration
+		message: messages[rule] // assign message
+	})
 })
 
 export { ValidationObserver, ValidationProvider }

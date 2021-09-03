@@ -1,56 +1,81 @@
 <template>
 	<div class="row">
-		<div class="col-lg-7 m-auto">
-			<card :title="'reset_password'">
-				<form @submit.prevent="reset">
-					<!-- Password -->
-					<div class="mb-3 row">
-						<label class="col-md-3 col-form-label text-md-end">
-							Password
-						</label>
-						<div class="col-md-7">
-							<input
-								v-model="form.password"
-								class="form-control"
-								type="password"
-								name="password"
-							/>
-						</div>
-					</div>
-
-					<!-- Password Confirmation -->
-					<div class="mb-3 row">
-						<label class="col-md-3 col-form-label text-md-end"
-							>Confirm Password</label
+		<div class="col-md-7 mx-auto">
+			<card title="Reset Password">
+				<ValidationObserver
+					ref="form"
+					v-slot="{ handleSubmit, invalid }"
+					tag="div"
+					class="form-group"
+				>
+					<form @submit.prevent="handleSubmit(reset)">
+						<ValidationProvider
+							vid="password"
+							name="Password"
+							rules="required|min:8"
+							v-slot="{ errors, valid, dirty }"
+							tag="div"
+							class="col-md-12 pt-2"
 						>
-						<div class="col-md-7">
+							<label for="password">Password</label>
 							<input
-								v-model="form.passwordConfirm"
-								class="form-control"
+								id="password"
+								v-model="form.password"
 								type="password"
-								name="passwordConfirm"
+								class="form-control"
+								autocomplete="on"
+								:class="!valid && dirty ? 'is-invalid' : ''"
 							/>
-						</div>
-					</div>
+							<div v-if="dirty" :class="!valid ? 'invalid-feedback' : ''">
+								{{ errors[0] }}
+							</div>
+						</ValidationProvider>
+						<ValidationProvider
+							vid="passwordConfirm"
+							name="Password Confirmation"
+							rules="required|confirmed:password"
+							v-slot="{ errors, valid, dirty }"
+							tag="div"
+							class="col-md-12 pt-2"
+						>
+							<label for="passwordConfirm">Password Confirmation</label>
+							<input
+								id="passwordConfirm"
+								v-model="form.passwordConfirm"
+								type="password"
+								class="form-control"
+								autocomplete="on"
+								:class="!valid && dirty ? 'is-invalid' : ''"
+							/>
+							<div v-if="dirty" :class="!valid ? 'invalid-feedback' : ''">
+								{{ errors[0] }}
+							</div>
+						</ValidationProvider>
 
-					<!-- Submit Button -->
-					<div class="mb-3 row">
-						<div class="col-md-9 ms-md-auto">
-							<v-button :loading="busy"> Reset Password </v-button>
+						<div class="col-md-12 pt-3 pb-3 d-flex justify-content-start">
+							<v-button :loading="busy" :disabled="invalid">
+								Reset Password
+							</v-button>
 						</div>
-					</div>
-				</form>
+					</form>
+				</ValidationObserver>
 			</card>
 		</div>
 	</div>
 </template>
 
 <script>
+import { ValidationObserver, ValidationProvider } from '~/plugins/vee-validate'
 export default {
 	middleware: 'guest',
 
 	metaInfo() {
-		return { title: 'reset_password' }
+		return { title: 'Reset Password' }
+	},
+
+	components: {
+		ValidationProvider,
+		ValidationObserver
 	},
 
 	data: () => ({
@@ -82,6 +107,10 @@ export default {
 				// Redirect home.
 				this.$router.push({ name: 'home' })
 			} catch (e) {
+				// should receive error format following way
+				// this.$refs.form.setErrors({
+				// 	email: ['email is required']
+				// })
 				this.errorAlert = e.response.data.message
 				this.busy = false
 			}

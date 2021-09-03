@@ -1,15 +1,10 @@
 <template>
 	<div class="row">
-		<div class="col-lg-7 m-auto">
-			<card :title="'verify_email'">
-				<template v-if="success">
-					<div class="alert alert-success" role="alert">
-						{{ success }}
-					</div>
-				</template>
-				<template v-else>
+		<div class="col-md-7 mx-auto">
+			<card title="Verify Email">
+				<template v-if="error">
 					<div class="alert alert-danger" role="alert">
-						{{ error || 'failed_to_verify_email' }}
+						{{ error || 'Failed to verify email' }}
 					</div>
 
 					<router-link
@@ -17,9 +12,8 @@
 							name: 'verification.resend',
 							query: { email: $route.query.email }
 						}"
-						class="small float-end"
 					>
-						resend_verification_link
+						Resend Verification Link
 					</router-link>
 				</template>
 			</card>
@@ -51,12 +45,11 @@ export default {
 	middleware: 'guest',
 
 	metaInfo() {
-		return { title: 'verify_email' }
+		return { title: 'Verify Email' }
 	},
 
 	data: () => ({
-		error: '',
-		success: ''
+		error: ''
 	}),
 
 	methods: {
@@ -68,7 +61,7 @@ export default {
 			await this.$store.dispatch('auth/updateUser', { user: data.data.user })
 
 			// Redirect home.
-			this.$router.push({ name: 'home' })
+			this.$router.replace({ name: 'home', query: { verified: true } })
 		}
 	}
 }

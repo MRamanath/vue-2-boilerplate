@@ -1,80 +1,123 @@
 <template>
 	<div class="row">
-		<div class="col-lg-7 m-auto">
-			<card :title="'register'">
-				<form @submit.prevent="register">
-					<!-- Name -->
-					<div class="mb-3 row">
-						<label class="col-md-3 col-form-label text-md-end">name</label>
-						<div class="col-md-7">
+		<div class="col-md-7 mx-auto">
+			<card title="Sign Up">
+				<ValidationObserver
+					ref="form"
+					v-slot="{ handleSubmit, invalid }"
+					tag="div"
+					class="form-group"
+				>
+					<form @submit.prevent="handleSubmit(register)">
+						<ValidationProvider
+							vid="name"
+							name="Name"
+							rules="required|alpha_spaces|max:25"
+							v-slot="{ errors, valid, dirty }"
+							tag="div"
+							class="col-md-12"
+						>
+							<label for="name">Name</label>
 							<input
+								id="name"
 								v-model="form.name"
-								class="form-control"
 								type="text"
-								name="name"
+								class="form-control"
+								:class="!valid && dirty ? 'is-invalid' : ''"
 							/>
-						</div>
-					</div>
-
-					<!-- Email -->
-					<div class="mb-3 row">
-						<label class="col-md-3 col-form-label text-md-end">email</label>
-						<div class="col-md-7">
+							<div v-if="dirty" :class="!valid ? 'invalid-feedback' : ''">
+								{{ errors[0] }}
+							</div>
+						</ValidationProvider>
+						<ValidationProvider
+							vid="email"
+							name="E-mail"
+							rules="required|email"
+							v-slot="{ errors, valid, dirty }"
+							tag="div"
+							class="col-md-12 pt-2"
+						>
+							<label for="email">Email</label>
 							<input
+								id="email"
 								v-model="form.email"
-								class="form-control"
 								type="email"
-								name="email"
+								class="form-control"
+								:class="!valid && dirty ? 'is-invalid' : ''"
 							/>
-						</div>
-					</div>
-
-					<!-- Password -->
-					<div class="mb-3 row">
-						<label class="col-md-3 col-form-label text-md-end">password </label>
-						<div class="col-md-7">
+							<div v-if="dirty" :class="!valid ? 'invalid-feedback' : ''">
+								{{ errors[0] }}
+							</div>
+						</ValidationProvider>
+						<ValidationProvider
+							vid="password"
+							name="Password"
+							rules="required|min:8"
+							v-slot="{ errors, valid, dirty }"
+							tag="div"
+							class="col-md-12 pt-2"
+						>
+							<label for="password">Password</label>
 							<input
+								id="password"
 								v-model="form.password"
-								class="form-control"
 								type="password"
-								name="password"
+								class="form-control"
+								autocomplete="on"
+								:class="!valid && dirty ? 'is-invalid' : ''"
 							/>
-						</div>
-					</div>
-
-					<!-- Password Confirmation -->
-					<div class="mb-3 row">
-						<label class="col-md-3 col-form-label text-md-end">
-							confirm_password
-						</label>
-						<div class="col-md-7">
+							<div v-if="dirty" :class="!valid ? 'invalid-feedback' : ''">
+								{{ errors[0] }}
+							</div>
+						</ValidationProvider>
+						<ValidationProvider
+							vid="passwordConfirm"
+							name="Password Confirmation"
+							rules="required|confirmed:password"
+							v-slot="{ errors, valid, dirty }"
+							tag="div"
+							class="col-md-12 pt-2"
+						>
+							<label for="passwordConfirm">Password Confirmation</label>
 							<input
+								id="passwordConfirm"
 								v-model="form.passwordConfirm"
-								class="form-control"
 								type="password"
-								name="passwordConfirm"
+								class="form-control"
+								autocomplete="on"
+								:class="!valid && dirty ? 'is-invalid' : ''"
 							/>
-						</div>
-					</div>
+							<div v-if="dirty" :class="!valid ? 'invalid-feedback' : ''">
+								{{ errors[0] }}
+							</div>
+						</ValidationProvider>
 
-					<div class="mb-3 row">
-						<div class="col-md-7 offset-md-3 d-flex">
-							<!-- Submit Button -->
-							<v-button :loading="busy"> register </v-button>
+						<div class="col-md-12 pt-3 pb-3 d-flex justify-content-between">
+							<v-button :loading="busy" :disabled="invalid"> Sign Up </v-button>
+							<span class="sign-in-link">
+								Already have an account?
+								<router-link :to="{ name: 'login' }"> Sign In </router-link>
+							</span>
 						</div>
-					</div>
-				</form>
+					</form>
+				</ValidationObserver>
 			</card>
 		</div>
 	</div>
 </template>
 
 <script>
+import { ValidationObserver, ValidationProvider } from '~/plugins/vee-validate'
 export default {
 	middleware: 'guest',
 
 	metaInfo() {
-		return { title: 'register' }
+		return { title: 'Register' }
+	},
+
+	components: {
+		ValidationProvider,
+		ValidationObserver
 	},
 
 	data: () => ({
@@ -99,7 +142,18 @@ export default {
 					data: this.form
 				})
 				this.busy = false
+
+				Object.keys(this.form).forEach((key) => (this.form[key] = ''))
+
+				// You should call it on the next frame
+				requestAnimationFrame(() => {
+					this.$refs.form.reset()
+				})
 			} catch (error) {
+				// should receive error format following way
+				// this.$refs.form.setErrors({
+				// 	email: ['email is required']
+				// })
 				this.errorAlert = error.response.data.message
 				this.busy = false
 			}
@@ -107,3 +161,10 @@ export default {
 	}
 }
 </script>
+<style scoped>
+span.sign-in-link {
+	display: inline-block;
+	vertical-align: middle;
+	margin: 10px 0;
+}
+</style>

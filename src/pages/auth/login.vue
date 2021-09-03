@@ -1,7 +1,11 @@
 <template>
 	<div class="row">
-		<div class="col-md-8 mx-auto" v-if="isVerificationPending">
-			Please verify your email -
+		<div
+			class="col-md-7 mx-auto text-center p-3 alert alert-warning"
+			role="alert"
+			v-if="isVerificationPending"
+		>
+			Please verify your email to login to your account or
 			<router-link
 				:to="{
 					name: 'verification.resend',
@@ -11,8 +15,8 @@
 				Resend Verification Link
 			</router-link>
 		</div>
-		<div class="col-md-6 mx-auto">
-			<card :title="'Login'">
+		<div class="col-md-7 mx-auto">
+			<card title="Sign In">
 				<ValidationObserver
 					ref="form"
 					v-slot="{ handleSubmit, invalid }"
@@ -68,16 +72,13 @@
 								remember me
 							</checkbox>
 
-							<router-link
-								:to="{ name: 'password.request' }"
-								class="small ms-auto my-auto"
-							>
-								forgot password?
+							<router-link :to="{ name: 'password.request' }">
+								Forgot Password?
 							</router-link>
 						</div>
 
 						<div class="d-flex justify-content-center">
-							<v-button :loading="busy" :disabled="invalid"> Login </v-button>
+							<v-button :loading="busy" :disabled="invalid"> Sign In </v-button>
 						</div>
 					</form>
 				</ValidationObserver>
@@ -93,7 +94,7 @@ export default {
 	middleware: 'guest',
 
 	metaInfo() {
-		return { title: 'login' }
+		return { title: 'Login' }
 	},
 
 	components: {
@@ -125,6 +126,7 @@ export default {
 
 				if (data.action && data.action === 'verificationPending') {
 					this.isVerificationPending = true
+					this.busy = false
 					return
 				}
 

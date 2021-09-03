@@ -1,39 +1,58 @@
 <template>
 	<div class="row">
-		<div class="col-lg-7 m-auto">
-			<card :title="'verify_email'">
-				<form @submit.prevent="send">
-					<!-- Email -->
-					<div class="mb-3 row">
-						<label class="col-md-3 col-form-label text-md-end">email </label>
-						<div class="col-md-7">
+		<div class="col-md-7 mx-auto">
+			<card title="Resend Verification Link">
+				<ValidationObserver
+					ref="form"
+					v-slot="{ handleSubmit, invalid }"
+					tag="div"
+					class="form-group"
+				>
+					<form @submit.prevent="handleSubmit(send)">
+						<ValidationProvider
+							vid="email"
+							name="E-mail"
+							rules="required|email"
+							v-slot="{ errors, valid, dirty }"
+							tag="div"
+							class="col-md-12"
+						>
+							<label for="email">Email</label>
 							<input
+								id="email"
 								v-model="form.email"
-								class="form-control"
 								type="email"
-								name="email"
+								class="form-control"
+								:class="!valid && dirty ? 'is-invalid' : ''"
 							/>
+							<div v-if="dirty" :class="!valid ? 'invalid-feedback' : ''">
+								{{ errors[0] }}
+							</div>
+						</ValidationProvider>
+						<div class="col-md-12 pt-3 pb-3 d-flex justify-content-start">
+							<v-button :loading="busy" :disabled="invalid">
+								Send Verification Link
+							</v-button>
 						</div>
-					</div>
-
-					<!-- Submit Button -->
-					<div class="mb-3 row">
-						<div class="col-md-9 ms-md-auto">
-							<v-button :loading="busy"> send_verification_link </v-button>
-						</div>
-					</div>
-				</form>
+					</form>
+				</ValidationObserver>
 			</card>
 		</div>
 	</div>
 </template>
 
 <script>
+import { ValidationObserver, ValidationProvider } from '~/plugins/vee-validate'
 export default {
 	middleware: 'guest',
 
 	metaInfo() {
-		return { title: 'verify_email' }
+		return { title: 'Resend Verification Link' }
+	},
+
+	components: {
+		ValidationProvider,
+		ValidationObserver
 	},
 
 	data: () => ({
@@ -54,14 +73,19 @@ export default {
 		async send() {
 			this.busy = true
 			try {
-				const { data } = await this.$http({
+				await this.$http({
 					url: '/users/email/resend',
 					method: 'PATCH',
 					data: this.form.email
 				})
-				console.log(data)
+
 				this.busy = false
-				// this.form.reset()
+				Object.keys(this.form).forEach((key) => (this.form[key] = ''))
+
+				// You should call it on the next frame
+				requestAnimationFrame(() => {
+					this.$refs.form.reset()
+				})
 			} catch (error) {
 				this.errorAlert = error.response.data.message
 				this.busy = false
